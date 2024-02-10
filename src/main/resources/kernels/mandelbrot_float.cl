@@ -1,4 +1,4 @@
-// An OpenCL kernel for computing the Mandelbrot set with double precision
+// An OpenCL kernel for computing the Mandelbrot set with float precision
 //
 // output : buffer with viewWidth * viewHeight elements, storing the colors as RGB integers
 // viewWidth : buffer width in pixels
@@ -28,19 +28,22 @@ __kernel void computeMandelbrot(
 	float x0 = minX + i * scaleX;
 	float y0 = minY + j * scaleY;
 
-	float x = 0;
-	float y = 0;
+	float x = 0.0;
+	float y = 0.0;
 
-	float magnitudeSquared = 0;
+	float xx = 0.0;
+	float yy = 0.0;
+
 	int iteration = 0;
 
-	while (iteration < maxIterations && magnitudeSquared < 4) {
+	while (iteration < maxIterations && xx + yy < 4) {
 
-		float xx = x * x;
-		float yy = y * y;
 		y = 2 * x * y + y0;
 		x = xx - yy + x0;
-		magnitudeSquared = xx + yy;
+
+		xx = x * x;
+		yy = y * y;
+
 		iteration++;
 	}
 

@@ -7,12 +7,33 @@ import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static java.lang.Math.toIntExact;
 
+/**
+ * @author Jonathan Guéhenneux
+ * @since 0.0.0
+ */
 public abstract class MandelbrotFractal extends Fractal {
+
+	protected static final Color[] BASE_PALETTE_COLORS = {
+			new Color(0, 0, 96),
+			new Color(128, 192, 255),
+			new Color(255, 255, 255),
+			new Color(255, 192, 0),
+			new Color(255, 96, 0) };
+
+	/**
+	 * @param interpolations
+	 * @return
+	 * @since 0.0.0
+	 */
+	protected static int[] createPalette(int interpolations) {
+		return createPalette(interpolations, BASE_PALETTE_COLORS);
+	}
 
 	/**
 	 * @param interpolations
 	 * @param colors
 	 * @return
+	 * @since 0.0.0
 	 */
 	private static int[] createPalette(int interpolations, Color... colors) {
 
@@ -21,14 +42,14 @@ public abstract class MandelbrotFractal extends Fractal {
 
 		var paletteIndex = 0;
 
-		for (var colorIndex = 0; colorIndex < colorCount - 1; colorIndex++) {
+		for (var colorIndex = 0; colorIndex < colorCount; colorIndex++) {
 
 			var color0 = colors[colorIndex];
 			var red0 = color0.getRed();
 			var green0 = color0.getGreen();
 			var blue0 = color0.getBlue();
 
-			var color1 = colors[colorIndex + 1];
+			var color1 = colors[(colorIndex + 1) % colorCount];
 			var red1 = color1.getRed();
 			var green1 = color1.getGreen();
 			var blue1 = color1.getBlue();
@@ -53,8 +74,7 @@ public abstract class MandelbrotFractal extends Fractal {
 		return palette;
 	}
 
-	protected final int[] palette;
-
+	protected int[] palette;
 	protected int maxIterations;
 
 	/**
@@ -67,12 +87,6 @@ public abstract class MandelbrotFractal extends Fractal {
 	public MandelbrotFractal(double minX, double maxX, double minY, double maxY, int maxIterations) {
 
 		super(minX, maxX, minY, maxY);
-
-		palette = createPalette(32,
-				new Color(0, 0, 96),
-				new Color(255, 255, 255),
-				new Color(255, 200, 0),
-				new Color(0, 0, 96));
 
 		this.maxIterations = maxIterations;
 	}

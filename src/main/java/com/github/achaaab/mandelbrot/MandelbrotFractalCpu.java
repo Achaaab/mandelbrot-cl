@@ -86,26 +86,28 @@ public class MandelbrotFractalCpu extends MandelbrotFractal {
 
 		for (var j = 0; j < imageHeight; j++) {
 
-			double x0 = minX + i * scaleX;
-			double y0 = minY + j * scaleY;
+			var x0 = minX + i * scaleX;
+			var y0 = minY + j * scaleY;
 
 			var x = 0.0;
 			var y = 0.0;
+			var xx = 0.0;
+			var yy = 0.0;
 
-			double xx;
-			double yy;
+			var iteration = 0;
 
-			int iteration = 0;
-
-			while (iteration < maxIterations && (xx = x * x) + (yy = y * y) < 4) {
+			while (iteration < maxIterations && xx + yy < 4) {
 
 				y = fma(x + x, y, y0);
 				x = xx - yy + x0;
 
+				xx = x * x;
+				yy = y * y;
+
 				iteration++;
 			}
 
-			int pixelIndex = j * imageWidth + i;
+			var pixelIndex = j * imageWidth + i;
 
 			if (iteration == maxIterations) {
 				data[pixelIndex] = 0;

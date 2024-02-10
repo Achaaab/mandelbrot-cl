@@ -28,19 +28,22 @@ __kernel void computeMandelbrot(
 	double x0 = minX + i * scaleX;
 	double y0 = minY + j * scaleY;
 
-	double x = 0;
-	double y = 0;
+	double x = 0.0;
+	double y = 0.0;
 
-	double magnitudeSquared = 0;
+	double xx = 0.0;
+	double yy = 0.0;
+
 	int iteration = 0;
 
-	while (iteration < maxIterations && magnitudeSquared < 4) {
+	while (iteration < maxIterations && xx + yy < 4) {
 
-		double xx = x * x;
-		double yy = y * y;
 		y = 2 * x * y + y0;
 		x = xx - yy + x0;
-		magnitudeSquared = xx + yy;
+
+		xx = x * x;
+		yy = y * y;
+
 		iteration++;
 	}
 

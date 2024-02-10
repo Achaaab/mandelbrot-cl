@@ -22,15 +22,15 @@ public class MandelbrotApplication {
 			var maxX = 0.6;
 			var minY = -1.3;
 			var maxY = 1.3;
-			var maxIterations = 100;
-			var viewWidth = 1500;
-			var viewHeight = 1500;
+			var maxIterations = 512;
+			var viewWidth = 1024;
+			var viewHeight = 1024;
 			var openCl = true;
 
 			var view = new FractalView(viewWidth, viewHeight);
 
 			var fractal = openCl ?
-					new MandelbrotFractalCl(minX, maxX, minY, maxY, maxIterations, viewWidth, viewHeight) :
+					new MandelbrotFractalCl(minX, maxX, minY, maxY, maxIterations) :
 					new MandelbrotFractalCpu(minX, maxX, minY, maxY, maxIterations);
 
 			var controller = new MandelbrotFractalController(fractal, view);
