@@ -1,5 +1,9 @@
 package com.github.achaaab.mandelbrot;
 
+import com.github.achaaab.mandelbrot.fractal.FractalView;
+import com.github.achaaab.mandelbrot.jocl.MandelbrotFractalClDouble;
+import com.github.achaaab.mandelbrot.jocl.MandelbrotFractalClFloat;
+
 import javax.swing.JFrame;
 
 import static javax.swing.SwingUtilities.invokeLater;
@@ -30,7 +34,7 @@ public class MandelbrotApplication {
 			var view = new FractalView(viewWidth, viewHeight);
 
 			var fractal = openCl ?
-					new MandelbrotFractalCl(minX, maxX, minY, maxY, maxIterations) :
+					new MandelbrotFractalClDouble(minX, maxX, minY, maxY, maxIterations) :
 					new MandelbrotFractalCpu(minX, maxX, minY, maxY, maxIterations);
 
 			var controller = new MandelbrotFractalController(fractal, view);

@@ -1,15 +1,22 @@
-package com.github.achaaab.mandelbrot;
+package com.github.achaaab.mandelbrot.fractal;
 
 import java.awt.Point;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
 import static java.lang.Math.pow;
+import static java.lang.String.format;
 
+/**
+ * @author Jonathan Guéhenneux
+ * @param <F> fractal type
+ * @since 0.0.0
+ */
 public abstract class FractalController<F extends Fractal>
-		implements MouseMotionListener, MouseWheelListener {
+		implements MouseMotionListener, MouseWheelListener, MouseListener {
 
 	protected final F fractal;
 	protected final FractalView view;
@@ -23,6 +30,7 @@ public abstract class FractalController<F extends Fractal>
 
 		previousMousePosition = new Point();
 
+		view.addMouseListener(this);
 		view.addMouseMotionListener(this);
 		view.addMouseWheelListener(this);
 	}
@@ -78,5 +86,38 @@ public abstract class FractalController<F extends Fractal>
 		update();
 	}
 
-	protected abstract void update();
+	@Override
+	public void mouseClicked(MouseEvent event) {
+
+		view.setMessageDisplayed(!view.isMessageDisplayed());
+		view.repaint();
+	}
+
+	@Override
+	public void mousePressed(MouseEvent event) {
+
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent event) {
+
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent event) {
+
+	}
+
+	@Override
+	public void mouseExited(MouseEvent event) {
+
+	}
+
+	protected void update() {
+
+		view.setMessage(format("[%f; %f[ x [%f; %f[",
+				fractal.getMinX(), fractal.getMaxX(), fractal.getMinY(), fractal.getMaxY()));
+
+		view.repaint();
+	}
 }

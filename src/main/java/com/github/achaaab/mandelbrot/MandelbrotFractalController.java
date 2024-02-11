@@ -1,9 +1,25 @@
 package com.github.achaaab.mandelbrot;
 
+import com.github.achaaab.mandelbrot.fractal.FractalController;
+import com.github.achaaab.mandelbrot.fractal.FractalView;
+
 import java.awt.event.MouseWheelEvent;
 
+/**
+ * This controller adds max iterations control with shift + mouse wheel rotation.
+ *
+ * @author Jonathan Guéhenneux
+ * @since 0.0.0
+ */
 public class MandelbrotFractalController extends FractalController<MandelbrotFractal> {
 
+	/**
+	 * Creates a new controller for the given Mandelbrot fractal and view.
+	 *
+	 * @param fractal Mandelbrot fractal
+	 * @param view fractal view
+	 * @since 0.0.0
+	 */
 	public MandelbrotFractalController(MandelbrotFractal fractal, FractalView view) {
 		super(fractal, view);
 	}
@@ -28,6 +44,7 @@ public class MandelbrotFractalController extends FractalController<MandelbrotFra
 
 		var image = view.getImage();
 		fractal.compute(image);
-		view.repaint();
+
+		super.update();
 	}
 }

@@ -1,5 +1,7 @@
 package com.github.achaaab.mandelbrot;
 
+import com.github.achaaab.mandelbrot.fractal.Fractal;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
@@ -89,6 +91,8 @@ public abstract class MandelbrotFractal extends Fractal {
 		super(minX, maxX, minY, maxY);
 
 		this.maxIterations = maxIterations;
+
+		palette = createPalette(128);
 	}
 
 	public void sharpen(int amount) {

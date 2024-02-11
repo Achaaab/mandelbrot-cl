@@ -1,4 +1,4 @@
-package com.github.achaaab.mandelbrot;
+package com.github.achaaab.mandelbrot.fractal;
 
 public abstract class Fractal {
 

@@ -1,5 +1,6 @@
-package com.github.achaaab.mandelbrot;
+package com.github.achaaab.mandelbrot.jocl;
 
+import com.github.achaaab.mandelbrot.MandelbrotFractal;
 import org.jocl.CL;
 import org.jocl.cl_command_queue;
 import org.jocl.cl_context;
@@ -8,18 +9,21 @@ import org.jocl.cl_mem;
 
 import java.awt.image.BufferedImage;
 
-import static com.github.achaaab.mandelbrot.JoclHelper.createBuffer;
-import static com.github.achaaab.mandelbrot.JoclHelper.createCommandQueue;
-import static com.github.achaaab.mandelbrot.JoclHelper.createContext;
-import static com.github.achaaab.mandelbrot.JoclHelper.createKernel;
-import static com.github.achaaab.mandelbrot.JoclHelper.createOutputBuffer;
-import static com.github.achaaab.mandelbrot.JoclHelper.enqueue;
-import static com.github.achaaab.mandelbrot.JoclHelper.getDevices;
-import static com.github.achaaab.mandelbrot.JoclHelper.getPlatforms;
-import static com.github.achaaab.mandelbrot.JoclHelper.loadImage;
-import static com.github.achaaab.mandelbrot.JoclHelper.setKernelArgument;
+import static com.github.achaaab.mandelbrot.jocl.JoclHelper.createBuffer;
+import static com.github.achaaab.mandelbrot.jocl.JoclHelper.createCommandQueue;
+import static com.github.achaaab.mandelbrot.jocl.JoclHelper.createContext;
+import static com.github.achaaab.mandelbrot.jocl.JoclHelper.createKernel;
+import static com.github.achaaab.mandelbrot.jocl.JoclHelper.createOutputBuffer;
+import static com.github.achaaab.mandelbrot.jocl.JoclHelper.enqueue;
+import static com.github.achaaab.mandelbrot.jocl.JoclHelper.getDevices;
+import static com.github.achaaab.mandelbrot.jocl.JoclHelper.getPlatforms;
+import static com.github.achaaab.mandelbrot.jocl.JoclHelper.loadImage;
+import static com.github.achaaab.mandelbrot.jocl.JoclHelper.setKernelArgument;
 
-public class MandelbrotFractalCl extends MandelbrotFractal {
+/**
+ *
+ */
+public class MandelbrotFractalClDouble extends MandelbrotFractal {
 
 	private final cl_context context;
 	private final cl_command_queue commandQueue;
@@ -28,7 +32,7 @@ public class MandelbrotFractalCl extends MandelbrotFractal {
 	private cl_mem rgbBuffer;
 	private final cl_mem paletteBuffer;
 
-	public MandelbrotFractalCl(double minX, double maxX, double minY, double maxY, int maxIterations) {
+	public MandelbrotFractalClDouble(double minX, double maxX, double minY, double maxY, int maxIterations) {
 
 		super(minX, maxX, minY, maxY, maxIterations);
 
@@ -40,7 +44,6 @@ public class MandelbrotFractalCl extends MandelbrotFractal {
 
 		commandQueue = createCommandQueue(context, device);
 		kernel = createKernel(context, "kernels/mandelbrot_double.cl", "computeMandelbrot");
-		palette = createPalette(128);
 		paletteBuffer = createBuffer(context, commandQueue, palette);
 	}
 

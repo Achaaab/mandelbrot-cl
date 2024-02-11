@@ -98,6 +98,8 @@ public class MandelbrotFractalCpu extends MandelbrotFractal {
 
 			while (iteration < maxIterations && xx + yy < 4) {
 
+				// if fma is not intrinsic, replace with standard multiply and add
+				// y = 2 * x * y + y0;
 				y = fma(x + x, y, y0);
 				x = xx - yy + x0;
 

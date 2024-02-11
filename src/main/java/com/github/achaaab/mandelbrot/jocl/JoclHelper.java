@@ -1,4 +1,4 @@
-package com.github.achaaab.mandelbrot;
+package com.github.achaaab.mandelbrot.jocl;
 
 import org.jocl.Pointer;
 import org.jocl.Sizeof;
