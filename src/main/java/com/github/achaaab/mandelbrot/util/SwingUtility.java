@@ -1,16 +1,10 @@
 package com.github.achaaab.mandelbrot.util;
 
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
-import java.awt.image.BufferedImage;
 
 import static java.awt.Toolkit.getDefaultToolkit;
-import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 import static java.lang.Math.round;
 
 /**

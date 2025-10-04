@@ -2,7 +2,6 @@ package com.github.achaaab.mandelbrot;
 
 import com.github.achaaab.mandelbrot.fractal.FractalView;
 import com.github.achaaab.mandelbrot.jocl.MandelbrotFractalClDouble;
-import com.github.achaaab.mandelbrot.jocl.MandelbrotFractalClFloat;
 
 import javax.swing.JFrame;
 
@@ -10,15 +9,17 @@ import static javax.swing.SwingUtilities.invokeLater;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 /**
+ * Simple desktop application drawing Mandelbrot fractal.
+ *
  * @author Jonathan Guéhenneux
  * @since 0.0.0
  */
-public class MandelbrotApplication {
+class MandelbrotApplication {
 
 	/**
-	 * @param arguments not used
+	 * @since 0.0.0
 	 */
-	public static void main(String... arguments) {
+	void main() {
 
 		invokeLater(() -> {
 

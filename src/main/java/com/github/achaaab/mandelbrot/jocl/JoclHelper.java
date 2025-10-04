@@ -12,12 +12,11 @@ import org.jocl.cl_platform_id;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
+import java.io.InputStreamReader;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.nio.file.Files.readString;
 import static java.util.Objects.requireNonNull;
 import static org.jocl.CL.CL_CONTEXT_PLATFORM;
 import static org.jocl.CL.CL_DEVICE_TYPE_ALL;
@@ -106,18 +105,17 @@ public class JoclHelper {
 		try {
 
 			var classLoader = JoclHelper.class.getClassLoader();
-			var resourceUrl = classLoader.getResource(resourceName);
-			var resourceUri = requireNonNull(resourceUrl).toURI();
-			var resourcePath = Path.of(resourceUri);
+			var resourceStream = requireNonNull(classLoader.getResourceAsStream(resourceName));
+			var resourceReader = new BufferedReader(new InputStreamReader(resourceStream, UTF_8));
+			var source = resourceReader.readAllAsString();
 
-			var source = readString(resourcePath, UTF_8);
 			var sourcePointer = new String[] { source };
 			var program = clCreateProgramWithSource(context, 1, sourcePointer, null, null);
 			clBuildProgram(program, 0, null, null, null, null);
 
 			return clCreateKernel(program, name, null);
 
-		} catch (URISyntaxException | IOException cause) {
+		} catch (IOException cause) {
 
 			throw new RuntimeException(cause);
 		}

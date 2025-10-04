@@ -1,5 +1,9 @@
 package com.github.achaaab.mandelbrot.fractal;
 
+/**
+ * @author Jonathan Guéhenneux
+ * @since 0.0.0
+ */
 public abstract class Fractal {
 
 	private double centerX;

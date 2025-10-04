@@ -95,9 +95,17 @@ public abstract class MandelbrotFractal extends Fractal {
 		palette = createPalette(128);
 	}
 
+	/**
+	 * @param amount
+	 * @since 0.0.0
+	 */
 	public void sharpen(int amount) {
 		maxIterations = max(maxIterations + amount, 2);
 	}
 
+	/**
+	 * @param image
+	 * @since 0.0.0
+	 */
 	public abstract void compute(BufferedImage image);
 }

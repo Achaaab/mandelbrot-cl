@@ -21,7 +21,10 @@ import static com.github.achaaab.mandelbrot.jocl.JoclHelper.loadImage;
 import static com.github.achaaab.mandelbrot.jocl.JoclHelper.setKernelArgument;
 
 /**
+ * Mandelbrot fractal computed with OpenCL, using double precision floating point numbers.
  *
+ * @author Jonathan Guéhenneux
+ * @since 0.0.0
  */
 public class MandelbrotFractalClDouble extends MandelbrotFractal {
 
@@ -32,6 +35,14 @@ public class MandelbrotFractalClDouble extends MandelbrotFractal {
 	private cl_mem rgbBuffer;
 	private final cl_mem paletteBuffer;
 
+	/**
+	 * @param minX
+	 * @param maxX
+	 * @param minY
+	 * @param maxY
+	 * @param maxIterations
+	 * @since 0.0.0
+	 */
 	public MandelbrotFractalClDouble(double minX, double maxX, double minY, double maxY, int maxIterations) {
 
 		super(minX, maxX, minY, maxY, maxIterations);
@@ -63,15 +74,18 @@ public class MandelbrotFractalClDouble extends MandelbrotFractal {
 			rgbBuffer = createOutputBuffer(context, imageWidth, imageHeight);
 		}
 
-		setKernelArgument(kernel, 0, rgbBuffer);
-		setKernelArgument(kernel, 1, imageWidth);
-		setKernelArgument(kernel, 2, minX);
-		setKernelArgument(kernel, 3, minY);
-		setKernelArgument(kernel, 4, scaleX);
-		setKernelArgument(kernel, 5, scaleY);
-		setKernelArgument(kernel, 6, maxIterations);
-		setKernelArgument(kernel, 7, paletteBuffer);
-		setKernelArgument(kernel, 8, palette.length);
+		var kernelArgumentIndex = 0;
+
+		setKernelArgument(kernel, kernelArgumentIndex++, rgbBuffer);
+		setKernelArgument(kernel, kernelArgumentIndex++, imageWidth);
+		setKernelArgument(kernel, kernelArgumentIndex++, imageHeight);
+		setKernelArgument(kernel, kernelArgumentIndex++, minX);
+		setKernelArgument(kernel, kernelArgumentIndex++, minY);
+		setKernelArgument(kernel, kernelArgumentIndex++, scaleX);
+		setKernelArgument(kernel, kernelArgumentIndex++, scaleY);
+		setKernelArgument(kernel, kernelArgumentIndex++, maxIterations);
+		setKernelArgument(kernel, kernelArgumentIndex++, paletteBuffer);
+		setKernelArgument(kernel, kernelArgumentIndex, palette.length);
 
 		enqueue(commandQueue, kernel, imageWidth, imageHeight);
 		loadImage(commandQueue, rgbBuffer, image);

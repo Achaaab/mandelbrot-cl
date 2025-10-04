@@ -2,17 +2,17 @@ package com.github.achaaab.mandelbrot;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 
 import static java.lang.Math.fma;
-import static java.lang.Math.max;
-import static java.lang.Runtime.getRuntime;
-import static java.lang.Thread.currentThread;
+import static java.util.stream.IntStream.range;
 
+/**
+ * Mandelbrot fractal computed with CPU.
+ *
+ * @author Jonathan Guéhenneux
+ * @since 0.0.0
+ */
 public class MandelbrotFractalCpu extends MandelbrotFractal {
-
-	private final int threadCount;
 
 	private int imageWidth;
 	private int imageHeight;
@@ -21,21 +21,19 @@ public class MandelbrotFractalCpu extends MandelbrotFractal {
 	private double scaleX;
 	private double scaleY;
 	private int[] data;
-	private AtomicInteger columnProvider;
 
 	/**
-	 * @param minX
-	 * @param maxX
-	 * @param minY
-	 * @param maxY
-	 * @param maxIterations
+	 * Creates a new Mandelbrot fractal.
+	 *
+	 * @param minX minimum x
+	 * @param maxX maximum x
+	 * @param minY minimum y
+	 * @param maxY maximum y
+	 * @param maxIterations maximum iterations for each pixel
+	 * @since 0.0.0
 	 */
 	public MandelbrotFractalCpu(double minX, double maxX, double minY, double maxY, int maxIterations) {
-
 		super(minX, maxX, minY, maxY, maxIterations);
-
-		var availableProcessors = getRuntime().availableProcessors();
-		threadCount = max(availableProcessors - 1, 1);
 	}
 
 	@Override
@@ -50,41 +48,21 @@ public class MandelbrotFractalCpu extends MandelbrotFractal {
 		scaleY = getHeight() / imageHeight;
 		minX = getMinX();
 		minY = getMinY();
-		columnProvider = new AtomicInteger(0);
 
-		var threads = Stream.generate(this::columnComputingTask).
-				map(Thread::new).limit(threadCount).
-				toList();
-
-		for (var thread : threads) {
-			thread.start();
-		}
-
-		for (var thread : threads) {
-
-			try {
-				thread.join();
-			} catch (InterruptedException interruptedException) {
-				currentThread().interrupt();
-			}
-		}
+		range(0, imageHeight).parallel().forEach(this::computeRow);
 	}
 
-	private Runnable columnComputingTask() {
+	/**
+	 * Computes every pixel in the identified row.
+	 *
+	 * @param j row to compute
+	 * @since 0.0.0
+	 */
+	private void computeRow(int j) {
 
-		return () -> {
+		var pixelIndex = (imageHeight - j - 1) * imageWidth;
 
-			int i;
-
-			while ((i = columnProvider.getAndIncrement()) < imageWidth) {
-				computeColumn(i);
-			}
-		};
-	}
-
-	private void computeColumn(int i) {
-
-		for (var j = 0; j < imageHeight; j++) {
+		for (var i = 0; i < imageWidth; i++) {
 
 			var x0 = minX + i * scaleX;
 			var y0 = minY + j * scaleY;
@@ -109,12 +87,10 @@ public class MandelbrotFractalCpu extends MandelbrotFractal {
 				iteration++;
 			}
 
-			var pixelIndex = j * imageWidth + i;
-
 			if (iteration == maxIterations) {
-				data[pixelIndex] = 0;
+				data[pixelIndex++] = 0;
 			} else {
-				data[pixelIndex] = palette[iteration % palette.length];
+				data[pixelIndex++] = palette[iteration % palette.length];
 			}
 		}
 	}

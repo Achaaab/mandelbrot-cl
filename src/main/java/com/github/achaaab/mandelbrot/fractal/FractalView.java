@@ -1,7 +1,5 @@
 package com.github.achaaab.mandelbrot.fractal;
 
-import com.github.achaaab.mandelbrot.util.SwingUtility;
-
 import javax.swing.JComponent;
 import java.awt.Color;
 import java.awt.Dimension;

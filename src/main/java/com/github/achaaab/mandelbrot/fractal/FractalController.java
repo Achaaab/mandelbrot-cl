@@ -51,7 +51,7 @@ public abstract class FractalController<F extends Fractal>
 		var scaleX = viewWidth / fractalWidth;
 		var scaleY = viewHeight / fractalHeight;
 
-		fractal.translate(dx / scaleX, dy / scaleY);
+		fractal.translate(dx / scaleX, -dy / scaleY);
 
 		previousMousePosition.setLocation(mousePosition);
 
@@ -79,7 +79,7 @@ public abstract class FractalController<F extends Fractal>
 		var scaleY = viewHeight / fractalHeight;
 
 		var x = fractal.getMinX() + mousePosition.x / scaleX;
-		var y = fractal.getMinY() + mousePosition.y / scaleY;
+		var y = fractal.getMinY() + (viewHeight - mousePosition.y - 1) / scaleY;
 
 		fractal.zoom(x, y, factor);
 
