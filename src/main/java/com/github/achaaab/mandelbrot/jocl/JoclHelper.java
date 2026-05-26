@@ -1,5 +1,6 @@
 package com.github.achaaab.mandelbrot.jocl;
 
+import org.jocl.CL;
 import org.jocl.Pointer;
 import org.jocl.Sizeof;
 import org.jocl.cl_command_queue;
@@ -15,14 +16,16 @@ import java.awt.image.DataBufferInt;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.List;
+import java.util.Set;
 
+import static com.github.achaaab.mandelbrot.util.Alignment.LEFT;
+import static com.github.achaaab.mandelbrot.util.StringUtilities.pad;
+import static java.lang.Math.toIntExact;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
-import static org.jocl.CL.CL_CONTEXT_PLATFORM;
-import static org.jocl.CL.CL_DEVICE_TYPE_ALL;
-import static org.jocl.CL.CL_MEM_READ_WRITE;
-import static org.jocl.CL.CL_MEM_WRITE_ONLY;
-import static org.jocl.CL.CL_TRUE;
 import static org.jocl.CL.clBuildProgram;
 import static org.jocl.CL.clCreateBuffer;
 import static org.jocl.CL.clCreateCommandQueueWithProperties;
@@ -33,6 +36,7 @@ import static org.jocl.CL.clEnqueueNDRangeKernel;
 import static org.jocl.CL.clEnqueueReadBuffer;
 import static org.jocl.CL.clEnqueueWriteBuffer;
 import static org.jocl.CL.clGetDeviceIDs;
+import static org.jocl.CL.clGetDeviceInfo;
 import static org.jocl.CL.clGetPlatformIDs;
 import static org.jocl.CL.clSetKernelArg;
 
@@ -44,6 +48,106 @@ import static org.jocl.CL.clSetKernelArg;
  * @since 0.0.0
  */
 public class JoclHelper {
+
+	private static final List<Integer> KEY_DEVICE_PARAMETERS = List.of(
+			CL.CL_DEVICE_NAME,
+			CL.CL_DEVICE_VENDOR,
+			CL.CL_DEVICE_OPENCL_C_VERSION,
+			CL.CL_DRIVER_VERSION,
+			CL.CL_DEVICE_EXTENSIONS);
+
+	private static final Set<Integer> DEVICE_PARAMETERS = Set.of(
+			CL.CL_DEVICE_TYPE,
+			CL.CL_DEVICE_VENDOR_ID,
+			CL.CL_DEVICE_MAX_COMPUTE_UNITS,
+			CL.CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS,
+			CL.CL_DEVICE_MAX_WORK_GROUP_SIZE,
+			CL.CL_DEVICE_MAX_WORK_ITEM_SIZES,
+			CL.CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR,
+			CL.CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT,
+			CL.CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT,
+			CL.CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG,
+			CL.CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT,
+			CL.CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE,
+			CL.CL_DEVICE_MAX_CLOCK_FREQUENCY,
+			CL.CL_DEVICE_ADDRESS_BITS,
+			CL.CL_DEVICE_MAX_READ_IMAGE_ARGS,
+			CL.CL_DEVICE_MAX_WRITE_IMAGE_ARGS,
+			CL.CL_DEVICE_MAX_MEM_ALLOC_SIZE,
+			CL.CL_DEVICE_IMAGE2D_MAX_WIDTH,
+			CL.CL_DEVICE_IMAGE2D_MAX_HEIGHT,
+			CL.CL_DEVICE_IMAGE3D_MAX_WIDTH,
+			CL.CL_DEVICE_IMAGE3D_MAX_HEIGHT,
+			CL.CL_DEVICE_IMAGE3D_MAX_DEPTH,
+			CL.CL_DEVICE_IMAGE_SUPPORT,
+			CL.CL_DEVICE_MAX_PARAMETER_SIZE,
+			CL.CL_DEVICE_MAX_SAMPLERS,
+			CL.CL_DEVICE_MEM_BASE_ADDR_ALIGN,
+			CL.CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE,
+			CL.CL_DEVICE_SINGLE_FP_CONFIG,
+			CL.CL_DEVICE_DOUBLE_FP_CONFIG,
+			CL.CL_DEVICE_HALF_FP_CONFIG,
+			CL.CL_DEVICE_GLOBAL_MEM_CACHE_TYPE,
+			CL.CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE,
+			CL.CL_DEVICE_GLOBAL_MEM_CACHE_SIZE,
+			CL.CL_DEVICE_GLOBAL_MEM_SIZE,
+			CL.CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE,
+			CL.CL_DEVICE_MAX_CONSTANT_ARGS,
+			CL.CL_DEVICE_LOCAL_MEM_TYPE,
+			CL.CL_DEVICE_LOCAL_MEM_SIZE,
+			CL.CL_DEVICE_ERROR_CORRECTION_SUPPORT,
+			CL.CL_DEVICE_PROFILING_TIMER_RESOLUTION,
+			CL.CL_DEVICE_ENDIAN_LITTLE,
+			CL.CL_DEVICE_AVAILABLE,
+			CL.CL_DEVICE_COMPILER_AVAILABLE,
+			CL.CL_DEVICE_EXECUTION_CAPABILITIES,
+			CL.CL_DEVICE_NAME,
+			CL.CL_DEVICE_VENDOR,
+			CL.CL_DRIVER_VERSION,
+			CL.CL_DEVICE_PROFILE,
+			CL.CL_DEVICE_VERSION,
+			CL.CL_DEVICE_EXTENSIONS,
+			CL.CL_DEVICE_PLATFORM,
+			CL.CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF,
+			CL.CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR,
+			CL.CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT,
+			CL.CL_DEVICE_NATIVE_VECTOR_WIDTH_INT,
+			CL.CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG,
+			CL.CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT,
+			CL.CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE,
+			CL.CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF,
+			CL.CL_DEVICE_OPENCL_C_VERSION,
+			CL.CL_DEVICE_LINKER_AVAILABLE,
+			CL.CL_DEVICE_BUILT_IN_KERNELS,
+			CL.CL_DEVICE_IMAGE_MAX_BUFFER_SIZE,
+			CL.CL_DEVICE_IMAGE_MAX_ARRAY_SIZE,
+			CL.CL_DEVICE_PARENT_DEVICE,
+			CL.CL_DEVICE_PARTITION_MAX_SUB_DEVICES,
+			CL.CL_DEVICE_PARTITION_PROPERTIES,
+			CL.CL_DEVICE_PARTITION_AFFINITY_DOMAIN,
+			CL.CL_DEVICE_PARTITION_TYPE,
+			CL.CL_DEVICE_REFERENCE_COUNT,
+			CL.CL_DEVICE_PREFERRED_INTEROP_USER_SYNC,
+			CL.CL_DEVICE_PRINTF_BUFFER_SIZE,
+			CL.CL_DEVICE_QUEUE_ON_HOST_PROPERTIES,
+			CL.CL_DEVICE_IMAGE_PITCH_ALIGNMENT,
+			CL.CL_DEVICE_IMAGE_BASE_ADDRESS_ALIGNMENT,
+			CL.CL_DEVICE_MAX_READ_WRITE_IMAGE_ARGS,
+			CL.CL_DEVICE_MAX_GLOBAL_VARIABLE_SIZE,
+			CL.CL_DEVICE_QUEUE_ON_DEVICE_PROPERTIES,
+			CL.CL_DEVICE_QUEUE_ON_DEVICE_PREFERRED_SIZE,
+			CL.CL_DEVICE_QUEUE_ON_DEVICE_MAX_SIZE,
+			CL.CL_DEVICE_MAX_ON_DEVICE_QUEUES,
+			CL.CL_DEVICE_MAX_ON_DEVICE_EVENTS,
+			CL.CL_DEVICE_SVM_CAPABILITIES,
+			CL.CL_DEVICE_GLOBAL_VARIABLE_PREFERRED_TOTAL_SIZE,
+			CL.CL_DEVICE_MAX_PIPE_ARGS,
+			CL.CL_DEVICE_PIPE_MAX_ACTIVE_RESERVATIONS,
+			CL.CL_DEVICE_PIPE_MAX_PACKET_SIZE,
+			CL.CL_DEVICE_PREFERRED_PLATFORM_ATOMIC_ALIGNMENT,
+			CL.CL_DEVICE_PREFERRED_GLOBAL_ATOMIC_ALIGNMENT,
+			CL.CL_DEVICE_PREFERRED_LOCAL_ATOMIC_ALIGNMENT);
+
 
 	/**
 	 * Creates a write-only buffer just large enough to contains {@code width x height} int values.
@@ -57,7 +161,7 @@ public class JoclHelper {
 	public static cl_mem createOutputBuffer(cl_context context, int width, int height) {
 
 		var size = (long) width * height * Sizeof.cl_int;
-		return createBuffer(context, CL_MEM_WRITE_ONLY, size);
+		return createBuffer(context, CL.CL_MEM_WRITE_ONLY, size);
 	}
 
 	/**
@@ -85,7 +189,7 @@ public class JoclHelper {
 	public static cl_mem createBuffer(cl_context context, cl_command_queue commandQueue, int[] array) {
 
 		var size = (long) array.length * Sizeof.cl_int;
-		var buffer = createBuffer(context, CL_MEM_READ_WRITE, size);
+		var buffer = createBuffer(context, CL.CL_MEM_READ_WRITE, size);
 		writeBuffer(commandQueue, array, buffer);
 
 		return buffer;
@@ -132,7 +236,7 @@ public class JoclHelper {
 	public static cl_context createContext(cl_platform_id platform, cl_device_id device) {
 
 		var contextProperties = new cl_context_properties();
-		contextProperties.addProperty(CL_CONTEXT_PLATFORM, platform);
+		contextProperties.addProperty(CL.CL_CONTEXT_PLATFORM, platform);
 		var selectedDevices = new cl_device_id[] { device };
 
 		return clCreateContext(contextProperties, 1, selectedDevices, null, null, null);
@@ -178,13 +282,75 @@ public class JoclHelper {
 	public static cl_device_id[] getDevices(cl_platform_id platform) {
 
 		var deviceCountPointer = new int[1];
-		clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, null, deviceCountPointer);
+		clGetDeviceIDs(platform, CL.CL_DEVICE_TYPE_ALL, 0, null, deviceCountPointer);
 		var deviceCount = deviceCountPointer[0];
 
 		var devices = new cl_device_id[deviceCount];
-		clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, deviceCount, devices, null);
+		clGetDeviceIDs(platform, CL.CL_DEVICE_TYPE_ALL, deviceCount, devices, null);
 
 		return devices;
+	}
+
+	/**
+	 * Gets string information about an OpenCL device.
+	 *
+	 * @param device device ID
+	 * @param parameter parameter
+	 * @return device information
+	 * @since 0.0.1
+	 */
+	public static String getDeviceStringInformation(cl_device_id device, int parameter) {
+
+		var size = new long[1];
+		clGetDeviceInfo(device, parameter, 0, null, size);
+
+		var buffer = new byte[toIntExact(size[0])];
+		clGetDeviceInfo(device, parameter, buffer.length, Pointer.to(buffer), null);
+
+		return new String(buffer, UTF_8);
+	}
+
+	/**
+	 * Gets long information about an OpenCL device.
+	 *
+	 * @param device device ID
+	 * @param parameter parameter
+	 * @return device information
+	 * @since 0.0.1
+	 */
+	public static long getDeviceLongInformation(cl_device_id device, int parameter) {
+
+		var value = new long[1];
+		clGetDeviceInfo(device, parameter, Sizeof.cl_long, Pointer.to(value), null);
+
+		return value[0];
+	}
+
+	/**
+	 * Gets information about an OpenCL device.
+	 *
+	 * @param device device ID
+	 * @since 0.0.1
+	 */
+	public static void dumpDeviceKeyInformation(cl_device_id device, OutputStream outputStream) {
+
+		try (var writer = new PrintWriter(outputStream)) {
+
+			for (var key : KEY_DEVICE_PARAMETERS) {
+
+				writer.print(pad(CL.stringFor_cl_device_info(key), 48, ' ', LEFT));
+				writer.println(" " + getDeviceStringInformation(device, key));
+			}
+		}
+	}
+	/**
+	 * Returns whether the given device supports double precision floating point numbers.
+	 *
+	 * @param device device ID
+	 * @since 0.0.1
+	 */
+	public static boolean hasDoublePrecisionSupport(cl_device_id device) {
+		return getDeviceLongInformation(device, CL.CL_DEVICE_DOUBLE_FP_CONFIG) != 0;
 	}
 
 	/**
@@ -281,7 +447,7 @@ public class JoclHelper {
 		var size = (long) array.length * Sizeof.cl_int;
 		var arrayPointer = Pointer.to(array);
 
-		clEnqueueReadBuffer(commandQueue, buffer, CL_TRUE, 0, size, arrayPointer, 0, null, null);
+		clEnqueueReadBuffer(commandQueue, buffer, CL.CL_TRUE, 0, size, arrayPointer, 0, null, null);
 	}
 
 	/**

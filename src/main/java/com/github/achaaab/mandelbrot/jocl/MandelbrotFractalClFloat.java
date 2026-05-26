@@ -51,6 +51,7 @@ public class MandelbrotFractalClFloat extends MandelbrotFractal {
 
 		var platform = getPlatforms()[0];
 		var device = getDevices(platform)[0];
+
 		context = createContext(platform, device);
 
 		commandQueue = createCommandQueue(context, device);

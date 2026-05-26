@@ -11,8 +11,8 @@ import static java.lang.Math.pow;
 import static java.lang.String.format;
 
 /**
- * @author Jonathan Guéhenneux
  * @param <F> fractal type
+ * @author Jonathan Guéhenneux
  * @since 0.0.0
  */
 public abstract class FractalController<F extends Fractal>
@@ -114,9 +114,15 @@ public abstract class FractalController<F extends Fractal>
 	}
 
 	protected void update() {
+		update(0.0);
+	}
 
-		view.setMessage(format("[%f; %f[ x [%f; %f[",
-				fractal.getMinX(), fractal.getMaxX(), fractal.getMinY(), fractal.getMaxY()));
+	protected void update(double duration) {
+
+		view.setMessage(format("[%f; %f[ x [%f; %f[ : %fs",
+				fractal.getMinX(), fractal.getMaxX(),
+				fractal.getMinY(), fractal.getMaxY(),
+				duration));
 
 		view.repaint();
 	}

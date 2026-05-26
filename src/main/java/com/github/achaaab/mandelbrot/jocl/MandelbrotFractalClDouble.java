@@ -14,9 +14,11 @@ import static com.github.achaaab.mandelbrot.jocl.JoclHelper.createCommandQueue;
 import static com.github.achaaab.mandelbrot.jocl.JoclHelper.createContext;
 import static com.github.achaaab.mandelbrot.jocl.JoclHelper.createKernel;
 import static com.github.achaaab.mandelbrot.jocl.JoclHelper.createOutputBuffer;
+import static com.github.achaaab.mandelbrot.jocl.JoclHelper.dumpDeviceKeyInformation;
 import static com.github.achaaab.mandelbrot.jocl.JoclHelper.enqueue;
 import static com.github.achaaab.mandelbrot.jocl.JoclHelper.getDevices;
 import static com.github.achaaab.mandelbrot.jocl.JoclHelper.getPlatforms;
+import static com.github.achaaab.mandelbrot.jocl.JoclHelper.hasDoublePrecisionSupport;
 import static com.github.achaaab.mandelbrot.jocl.JoclHelper.loadImage;
 import static com.github.achaaab.mandelbrot.jocl.JoclHelper.setKernelArgument;
 
@@ -51,6 +53,13 @@ public class MandelbrotFractalClDouble extends MandelbrotFractal {
 
 		var platform = getPlatforms()[0];
 		var device = getDevices(platform)[0];
+
+		if (!hasDoublePrecisionSupport(device)) {
+
+			IO.println("Your OpenCL device does not seem to support double precision. Continuing anyway.");
+			dumpDeviceKeyInformation(device, System.out);
+		}
+
 		context = createContext(platform, device);
 
 		commandQueue = createCommandQueue(context, device);

@@ -38,19 +38,32 @@ public class SwingUtility {
 	}
 
 	/**
-	 * @param graphics
-	 * @param text
-	 * @param x
-	 * @param y
-	 * @return
+	 * Measures and returns the given text bounds, using the given graphics context.
+	 *
+	 * @param graphics graphics in which the text will be drawn
+	 * @param text text to measure
+	 * @param x left position of the text to measure
+	 * @param y bottom position of the text to measure
+	 * @param margin bounds margin in pixels
+	 * @return text bounds including margin
 	 * @since 0.0.0
 	 */
-	public static Rectangle getTextBounds(Graphics2D graphics, String text, float x, float y) {
+	public static Rectangle getTextBounds(
+			Graphics2D graphics,
+			String text,
+			float x, float y, int margin) {
 
 		var font = graphics.getFont();
 		var renderContext = graphics.getFontRenderContext();
 		var glyphVector = font.createGlyphVector(renderContext, text);
-		return glyphVector.getPixelBounds(null, x, y);
+		var bounds = glyphVector.getPixelBounds(null, x, y);
+
+		bounds.x -= margin;
+		bounds.y -= margin;
+		bounds.width += 2 * margin;
+		bounds.height += 2 * margin;
+
+		return bounds;
 	}
 
 	/**

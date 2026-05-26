@@ -5,6 +5,8 @@ import com.github.achaaab.mandelbrot.fractal.FractalView;
 
 import java.awt.event.MouseWheelEvent;
 
+import static java.lang.System.nanoTime;
+
 /**
  * This controller adds max iterations control with shift + mouse wheel rotation.
  *
@@ -43,8 +45,11 @@ public class MandelbrotFractalController extends FractalController<MandelbrotFra
 	protected void update() {
 
 		var image = view.getImage();
-		fractal.compute(image);
 
-		super.update();
+		var start = nanoTime();
+		fractal.compute(image);
+		var duration = (nanoTime() - start) / 1_000_000_000.0;
+
+		super.update(duration);
 	}
 }

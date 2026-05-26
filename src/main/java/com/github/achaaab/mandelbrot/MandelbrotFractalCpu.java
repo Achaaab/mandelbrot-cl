@@ -14,13 +14,13 @@ import static java.util.stream.IntStream.range;
  */
 public class MandelbrotFractalCpu extends MandelbrotFractal {
 
-	private int imageWidth;
-	private int imageHeight;
-	private double minX;
-	private double minY;
-	private double scaleX;
-	private double scaleY;
-	private int[] data;
+	protected int imageWidth;
+	protected int imageHeight;
+	protected double minX;
+	protected double minY;
+	protected double scaleX;
+	protected double scaleY;
+	protected int[] colorBuffer;
 
 	/**
 	 * Creates a new Mandelbrot fractal.
@@ -41,7 +41,7 @@ public class MandelbrotFractalCpu extends MandelbrotFractal {
 
 		var dataBuffer = (DataBufferInt) image.getRaster().getDataBuffer();
 
-		data = dataBuffer.getData();
+		colorBuffer = dataBuffer.getData();
 		imageWidth = image.getWidth();
 		imageHeight = image.getHeight();
 		scaleX = getWidth() / imageWidth;
@@ -58,7 +58,7 @@ public class MandelbrotFractalCpu extends MandelbrotFractal {
 	 * @param j row to compute
 	 * @since 0.0.0
 	 */
-	private void computeRow(int j) {
+	protected void computeRow(int j) {
 
 		var pixelIndex = (imageHeight - j - 1) * imageWidth;
 
@@ -88,9 +88,9 @@ public class MandelbrotFractalCpu extends MandelbrotFractal {
 			}
 
 			if (iteration == maxIterations) {
-				data[pixelIndex++] = 0;
+				colorBuffer[pixelIndex++] = 0;
 			} else {
-				data[pixelIndex++] = palette[iteration % palette.length];
+				colorBuffer[pixelIndex++] = palette[iteration % palette.length];
 			}
 		}
 	}

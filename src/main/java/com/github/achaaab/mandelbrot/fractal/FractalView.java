@@ -22,9 +22,16 @@ import static java.awt.image.BufferedImage.TYPE_INT_RGB;
  */
 public class FractalView extends JComponent {
 
-	private static final Point MESSAGE_POSITION = new Point(scale(2), scale(2));
+	/**
+	 * Bottom left position of the message.
+	 *
+	 * @since 0.0.0
+	 */
+	private static final Point MESSAGE_POSITION = new Point(scale(10), scale(20));
+
 	private static final float MESSAGE_FONT_SIZE = scale(12.0f);
 	private static final Color MESSAGE_COLOR = RED;
+	private static final int MESSAGE_MARGIN = scale(4.0f);
 
 	private final BufferedImage image;
 	private boolean messageDisplayed;
@@ -61,15 +68,13 @@ public class FractalView extends JComponent {
 			graphics2d.setFont(messageFont);
 
 			var messageBounds = getTextBounds(graphics2d, message,
-					MESSAGE_POSITION.x, MESSAGE_POSITION.y);
-
-			messageBounds.y += messageBounds.height;
+					MESSAGE_POSITION.x, MESSAGE_POSITION.y, MESSAGE_MARGIN);
 
 			graphics2d.setColor(BLACK);
 			graphics2d.fill(messageBounds);
 
 			graphics.setColor(MESSAGE_COLOR);
-			graphics.drawString(message, MESSAGE_POSITION.x, MESSAGE_POSITION.y + messageBounds.height);
+			graphics.drawString(message, MESSAGE_POSITION.x, MESSAGE_POSITION.y);
 		}
 	}
 
