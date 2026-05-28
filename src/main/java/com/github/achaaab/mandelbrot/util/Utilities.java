@@ -1,12 +1,32 @@
 package com.github.achaaab.mandelbrot.util;
 
+import java.time.Duration;
+
+import static java.time.Instant.now;
+
 /**
- * Utility methods for string manipulation.
+ * Miscellaneous utility methods.
  *
  * @author Jonathan Guéhenneux
  * @since 0.0.1
  */
-public class StringUtilities {
+public final class Utilities {
+
+	/**
+	 * Runs a given runnable and measures its running time.
+	 *
+	 * @param runnable runnable to run
+	 * @return measured running time
+	 * @since 0.0.1
+	 */
+	public static Duration time(Runnable runnable) {
+
+		var start = now();
+		runnable.run();
+		var end = now();
+
+		return Duration.between(start, end);
+	}
 
 	/**
 	 * Pads the specified string with specified padding character.

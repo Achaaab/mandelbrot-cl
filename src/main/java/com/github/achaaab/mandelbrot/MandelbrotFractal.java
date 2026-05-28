@@ -77,30 +77,38 @@ public abstract class MandelbrotFractal extends Fractal {
 	}
 
 	protected int[] palette;
-	protected int maxIterations;
+	protected int iterations;
 
 	/**
 	 * @param minX
 	 * @param maxX
 	 * @param minY
 	 * @param maxY
-	 * @param maxIterations
+	 * @param iterations
 	 */
-	public MandelbrotFractal(double minX, double maxX, double minY, double maxY, int maxIterations) {
+	public MandelbrotFractal(double minX, double maxX, double minY, double maxY, int iterations) {
 
 		super(minX, maxX, minY, maxY);
 
-		this.maxIterations = maxIterations;
+		this.iterations = iterations;
 
 		palette = createPalette(128);
 	}
 
 	/**
-	 * @param amount
+	 * @param delta
 	 * @since 0.0.0
 	 */
-	public void sharpen(int amount) {
-		maxIterations = max(maxIterations + amount, 2);
+	public void adjustIterations(int delta) {
+		iterations = max(iterations + delta, 2);
+	}
+
+	/**
+	 * @return maximum number of iterations before giving up and considering the point is inside the set
+	 * @since 0.0.1
+	 */
+	public int getIterations() {
+		return iterations;
 	}
 
 	/**

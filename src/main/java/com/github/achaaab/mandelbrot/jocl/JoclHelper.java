@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.github.achaaab.mandelbrot.util.Alignment.LEFT;
-import static com.github.achaaab.mandelbrot.util.StringUtilities.pad;
+import static com.github.achaaab.mandelbrot.util.Utilities.pad;
 import static java.lang.Math.toIntExact;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;

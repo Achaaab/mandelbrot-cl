@@ -8,6 +8,7 @@ Simple Swing animation, allowing to explore the Mandelbrot set.
 <img src="data/screenshots/mandelbrot_1.png" width="1024" alt="Mandelbrot zoom"/>
 <img src="data/screenshots/mandelbrot_2.png" width="1024" alt="Mandelbrot zoom"/>
 <img src="data/screenshots/mandelbrot_3.png" width="1024" alt="Mandelbrot zoom"/>
+<img src="data/screenshots/mandelbrot_4.png" width="1026" alt="Mandelbrot zoom"/>
 
 ## Build and run
 

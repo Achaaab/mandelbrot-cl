@@ -42,12 +42,12 @@ public class MandelbrotFractalClDouble extends MandelbrotFractal {
 	 * @param maxX
 	 * @param minY
 	 * @param maxY
-	 * @param maxIterations
+	 * @param iterations
 	 * @since 0.0.0
 	 */
-	public MandelbrotFractalClDouble(double minX, double maxX, double minY, double maxY, int maxIterations) {
+	public MandelbrotFractalClDouble(double minX, double maxX, double minY, double maxY, int iterations) {
 
-		super(minX, maxX, minY, maxY, maxIterations);
+		super(minX, maxX, minY, maxY, iterations);
 
 		CL.setExceptionsEnabled(true);
 
@@ -92,7 +92,7 @@ public class MandelbrotFractalClDouble extends MandelbrotFractal {
 		setKernelArgument(kernel, kernelArgumentIndex++, minY);
 		setKernelArgument(kernel, kernelArgumentIndex++, scaleX);
 		setKernelArgument(kernel, kernelArgumentIndex++, scaleY);
-		setKernelArgument(kernel, kernelArgumentIndex++, maxIterations);
+		setKernelArgument(kernel, kernelArgumentIndex++, iterations);
 		setKernelArgument(kernel, kernelArgumentIndex++, paletteBuffer);
 		setKernelArgument(kernel, kernelArgumentIndex, palette.length);
 

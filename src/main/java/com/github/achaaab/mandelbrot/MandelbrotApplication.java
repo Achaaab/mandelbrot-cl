@@ -54,17 +54,25 @@ class MandelbrotApplication {
 			};
 
 			var controller = new MandelbrotFractalController(fractal, view);
-
-			controller.update();
+			controller.requestUpdate();
 
 			var frame = new JFrame("Mandelbrot set rendering");
 			frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
 			frame.setContentPane(view);
 			frame.pack();
+			frame.setResizable(false);
 			frame.setVisible(true);
 		});
 	}
 
+	/**
+	 * @param minX
+	 * @param maxX
+	 * @param minY
+	 * @param maxY
+	 * @param maxIterations
+	 * @return
+	 */
 	private static MandelbrotFractal createMandelbrotFactalSimd(
 			double minX, double maxX, double minY, double maxY, int maxIterations) {
 

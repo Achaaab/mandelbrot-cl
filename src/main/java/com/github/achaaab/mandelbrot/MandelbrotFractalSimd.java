@@ -90,7 +90,7 @@ public class MandelbrotFractalSimd extends MandelbrotFractal {
 			var iteration = zero(SPECIES);
 			var x0 = broadcast(SPECIES, minX + i * scaleX).add(offset);
 
-			for (var n = 0; n < maxIterations; n++) {
+			for (var n = 0; n < iterations; n++) {
 
 				var xx = x.mul(x);
 				var yy = y.mul(y);
@@ -111,7 +111,7 @@ public class MandelbrotFractalSimd extends MandelbrotFractal {
 
 			for (var lane = 0; lane < LANE_COUNT; lane++) {
 
-				if (iterationArray[lane] == maxIterations) {
+				if (iterationArray[lane] == iterations) {
 					colorBuffer[colorIndex++] = 0x000000;
 				} else {
 					colorBuffer[colorIndex++] = palette[(int) iterationArray[lane] % palette.length];

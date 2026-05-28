@@ -1,14 +1,20 @@
 package com.github.achaaab.mandelbrot.fractal;
 
+import javax.swing.SwingUtilities;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.Math.pow;
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
 /**
  * @param <F> fractal type
@@ -23,12 +29,25 @@ public abstract class FractalController<F extends Fractal>
 
 	private final Point previousMousePosition;
 
+	private final ExecutorService executor;
+	private final AtomicBoolean updatePending;
+	private final AtomicBoolean updateRequested;
+
+	/**
+	 * @param fractal
+	 * @param view
+	 * @since 0.0.1
+	 */
 	public FractalController(F fractal, FractalView view) {
 
 		this.fractal = fractal;
 		this.view = view;
 
 		previousMousePosition = new Point();
+
+		executor = newSingleThreadExecutor();
+		updatePending = new AtomicBoolean();
+		updateRequested = new AtomicBoolean();
 
 		view.addMouseListener(this);
 		view.addMouseMotionListener(this);
@@ -55,7 +74,7 @@ public abstract class FractalController<F extends Fractal>
 
 		previousMousePosition.setLocation(mousePosition);
 
-		update();
+		requestUpdate();
 	}
 
 	@Override
@@ -83,7 +102,7 @@ public abstract class FractalController<F extends Fractal>
 
 		fractal.zoom(x, y, factor);
 
-		update();
+		requestUpdate();
 	}
 
 	@Override
@@ -113,17 +132,71 @@ public abstract class FractalController<F extends Fractal>
 
 	}
 
-	protected void update() {
-		update(0.0);
+	/**
+	 * @since 0.0.1
+	 */
+	public void requestUpdate() {
+
+		if (updatePending.compareAndSet(false, true)) {
+			executor.submit(() -> update());
+		} else {
+			updateRequested.set(true);
+		}
 	}
 
-	protected void update(double duration) {
+	/**
+	 * @since 0.0.1
+	 */
+	protected void update() {
+		update(getMessage());
+	}
 
-		view.setMessage(format("[%f; %f[ x [%f; %f[ : %fs",
+	/**
+	 * @param message
+	 * @since 0.0.1
+	 */
+	protected final void update(String message) {
+
+		var interrupted = false;
+
+		try {
+
+			view.setMessage(message);
+			SwingUtilities.invokeAndWait(view::paintImmediately);
+
+		} catch (InterruptedException interruptedException) {
+
+			interrupted = true;
+
+		} catch (InvocationTargetException invocationTargetException) {
+
+			System.err.printf("Repaint error: %s.%n", invocationTargetException.getMessage());
+
+		} finally {
+
+			if (!interrupted && updateRequested.compareAndSet(true, false)) {
+
+				update();
+
+			} else {
+
+				updatePending.set(false);
+
+				if (interrupted) {
+					currentThread().interrupt();
+				}
+			}
+		}
+	}
+
+	/**
+	 * @return
+	 * @since 0.0.1
+	 */
+	protected String getMessage() {
+
+		return format("[%+.12f; %+.12f] x [%+.12f; %+.12f]",
 				fractal.getMinX(), fractal.getMaxX(),
-				fractal.getMinY(), fractal.getMaxY(),
-				duration));
-
-		view.repaint();
+				fractal.getMinY(), fractal.getMaxY());
 	}
 }

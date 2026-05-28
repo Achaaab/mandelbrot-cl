@@ -1,6 +1,8 @@
 package com.github.achaaab.mandelbrot.fractal;
 
 /**
+ * Abstraction for two-dimensional fractals.
+ *
  * @author Jonathan Guéhenneux
  * @since 0.0.0
  */

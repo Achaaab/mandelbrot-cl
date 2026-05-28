@@ -3,15 +3,18 @@ package com.github.achaaab.mandelbrot.fractal;
 import javax.swing.JComponent;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 
-import static com.github.achaaab.mandelbrot.util.SwingUtility.getTextBounds;
-import static com.github.achaaab.mandelbrot.util.SwingUtility.scale;
+import static com.github.achaaab.mandelbrot.util.SwingUtilities.getTextBounds;
+import static com.github.achaaab.mandelbrot.util.SwingUtilities.scale;
 import static java.awt.Color.BLACK;
 import static java.awt.Color.RED;
+import static java.awt.Font.MONOSPACED;
+import static java.awt.Font.PLAIN;
 import static java.awt.image.BufferedImage.TYPE_INT_RGB;
 
 /**
@@ -29,7 +32,7 @@ public class FractalView extends JComponent {
 	 */
 	private static final Point MESSAGE_POSITION = new Point(scale(10), scale(20));
 
-	private static final float MESSAGE_FONT_SIZE = scale(12.0f);
+	private static final Font MESSAGE_FONT = new Font(MONOSPACED, PLAIN, scale(10.0f));
 	private static final Color MESSAGE_COLOR = RED;
 	private static final int MESSAGE_MARGIN = scale(4.0f);
 
@@ -53,6 +56,15 @@ public class FractalView extends JComponent {
 		setPreferredSize(preferredSize);
 	}
 
+	/**
+	 * Paints immediately the whole component bounds.
+	 *
+	 * @since 0.0.1
+	 */
+	public void paintImmediately() {
+		paintImmediately(0, 0, getWidth(), getHeight());
+	}
+
 	@Override
 	public void paintComponent(Graphics graphics) {
 
@@ -61,11 +73,9 @@ public class FractalView extends JComponent {
 		super.paintComponent(graphics2d);
 		graphics2d.drawImage(image, 0, 0, this);
 
-		if (messageDisplayed) {
+		if (messageDisplayed && message != null) {
 
-			var font = graphics2d.getFont();
-			var messageFont = font.deriveFont(MESSAGE_FONT_SIZE);
-			graphics2d.setFont(messageFont);
+			graphics2d.setFont(MESSAGE_FONT);
 
 			var messageBounds = getTextBounds(graphics2d, message,
 					MESSAGE_POSITION.x, MESSAGE_POSITION.y, MESSAGE_MARGIN);

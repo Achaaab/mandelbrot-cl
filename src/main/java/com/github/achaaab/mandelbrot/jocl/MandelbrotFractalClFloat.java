@@ -84,7 +84,7 @@ public class MandelbrotFractalClFloat extends MandelbrotFractal {
 		setKernelArgument(kernel, kernelArgumentIndex++, minY);
 		setKernelArgument(kernel, kernelArgumentIndex++, scaleX);
 		setKernelArgument(kernel, kernelArgumentIndex++, scaleY);
-		setKernelArgument(kernel, kernelArgumentIndex++, maxIterations);
+		setKernelArgument(kernel, kernelArgumentIndex++, iterations);
 		setKernelArgument(kernel, kernelArgumentIndex++, paletteBuffer);
 		setKernelArgument(kernel, kernelArgumentIndex, palette.length);
 

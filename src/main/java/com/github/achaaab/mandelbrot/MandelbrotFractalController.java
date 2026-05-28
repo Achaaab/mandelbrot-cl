@@ -2,10 +2,14 @@ package com.github.achaaab.mandelbrot;
 
 import com.github.achaaab.mandelbrot.fractal.FractalController;
 import com.github.achaaab.mandelbrot.fractal.FractalView;
+import com.github.achaaab.mandelbrot.util.QuadraticProgression;
 
 import java.awt.event.MouseWheelEvent;
+import java.time.Duration;
 
-import static java.lang.System.nanoTime;
+import static com.github.achaaab.mandelbrot.util.Utilities.time;
+import static java.lang.Math.round;
+import static java.lang.Math.toIntExact;
 
 /**
  * This controller adds max iterations control with shift + mouse wheel rotation.
@@ -15,6 +19,8 @@ import static java.lang.System.nanoTime;
  */
 public class MandelbrotFractalController extends FractalController<MandelbrotFractal> {
 
+	private final QuadraticProgression iterationProgression;
+
 	/**
 	 * Creates a new controller for the given Mandelbrot fractal and view.
 	 *
@@ -23,7 +29,10 @@ public class MandelbrotFractalController extends FractalController<MandelbrotFra
 	 * @since 0.0.0
 	 */
 	public MandelbrotFractalController(MandelbrotFractal fractal, FractalView view) {
+
 		super(fractal, view);
+
+		iterationProgression = new QuadraticProgression(1.0, 0.5, 200_000_000L, 500_000_000L);
 	}
 
 	@Override
@@ -31,9 +40,10 @@ public class MandelbrotFractalController extends FractalController<MandelbrotFra
 
 		if (event.isShiftDown()) {
 
-			var amount = -5 * event.getWheelRotation();
-			fractal.sharpen(amount);
-			update();
+			var wheelRotation = -event.getWheelRotation();
+			var factor = iterationProgression.update(wheelRotation > 0);
+			fractal.adjustIterations(toIntExact(round(factor * wheelRotation)));
+			requestUpdate();
 
 		} else {
 
@@ -45,11 +55,29 @@ public class MandelbrotFractalController extends FractalController<MandelbrotFra
 	protected void update() {
 
 		var image = view.getImage();
+		var computeDuration = time(() -> fractal.compute(image));
 
-		var start = nanoTime();
-		fractal.compute(image);
-		var duration = (nanoTime() - start) / 1_000_000_000.0;
+		update(getMessage(computeDuration));
+	}
 
-		super.update(duration);
+	/**
+	 * Builds custom message for Mandelbrot fractal.
+	 *
+	 * @param duration computing duration
+	 * @return built custom message
+	 * @since 0.0.1
+	 */
+	private String getMessage(Duration duration) {
+
+		var seconds = duration.getNano() / 1_000_000_000.0;
+		var baseMessage = getMessage();
+
+		var maxIterations = fractal.getIterations();
+		var iterationPluralized = maxIterations > 1 ? "iterations" : "iteration";
+
+		var additionalMessage = String.format("    %d " + iterationPluralized + " (%.4fs)",
+				maxIterations, seconds);
+
+		return baseMessage + additionalMessage;
 	}
 }

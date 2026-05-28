@@ -74,7 +74,7 @@ public class MandelbrotFractalCpu extends MandelbrotFractal {
 
 			var iteration = 0;
 
-			while (iteration < maxIterations && xx + yy < 4) {
+			while (iteration < iterations && xx + yy < 4) {
 
 				// if fma is not intrinsic, replace with standard multiply and add
 				// y = 2 * x * y + y0;
@@ -87,7 +87,7 @@ public class MandelbrotFractalCpu extends MandelbrotFractal {
 				iteration++;
 			}
 
-			if (iteration == maxIterations) {
+			if (iteration == iterations) {
 				colorBuffer[pixelIndex++] = 0;
 			} else {
 				colorBuffer[pixelIndex++] = palette[iteration % palette.length];

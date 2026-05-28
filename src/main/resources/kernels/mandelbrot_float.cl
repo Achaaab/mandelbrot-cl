@@ -39,6 +39,7 @@ __kernel void computeMandelbrot(
 
 	while (iteration < maxIterations && xx + yy < 4) {
 
+		//y = mad(x + x, y, y0);
 		y = 2 * x * y + y0;
 		x = xx - yy + x0;
 

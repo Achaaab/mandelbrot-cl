@@ -13,7 +13,7 @@ import static java.lang.Math.round;
  * @author Jonathan Guéhenneux
  * @since 0.0.0
  */
-public class SwingUtility {
+public final class SwingUtilities {
 
 	private static final Toolkit TOOLKIT = getDefaultToolkit();
 	private static final float BASE_RESOLUTION = 72.0f;
@@ -71,7 +71,7 @@ public class SwingUtility {
 	 *
 	 * @since 0.0.0
 	 */
-	private SwingUtility() {
+	private SwingUtilities() {
 
 	}
 }
